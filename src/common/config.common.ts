@@ -5,7 +5,7 @@ dotenv.config({ override: true });
 dotenv.config({ path: ".env.local", override: true });
 
 export const CONFIG = parseEnv(process.env, {
-  URL: z.string(),
+  // URL: z.string(),
   PORT: port().default(3000),
   MONGOURI: z.string(),
   JWT_ACCESS_TOKEN_SECRET: z.string(),
