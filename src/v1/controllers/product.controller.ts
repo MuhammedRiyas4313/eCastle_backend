@@ -27,17 +27,19 @@ export const getProducts = async (req: Request, res: Response, next: NextFunctio
     let matchObj: Record<string, any> = {};
     let pipeline: PipelineStage[] = [];
 
-    if(req.query.search && typeof req.query.search === "string"){
+    const queryParams = { ...req.query };
+
+    if (req.query.search && typeof req.query.search === "string") {
       matchObj.$or = [
         {
-          title: { $regex: new RegExp(req.query.search?.trim(), "i") }
+          title: { $regex: new RegExp(req.query.search?.trim(), "i") },
         },
         {
-          category: { $regex: new RegExp(req.query.search?.trim(), "i") }
-        }
-      ]
-      req.query.pageIndex = "0";
-      req.query.pageSize = "10";
+          category: { $regex: new RegExp(req.query.search?.trim(), "i") },
+        },
+      ];
+      queryParams.pageIndex = "0";
+      queryParams.pageSize = "10";
     }
 
     pipeline = [
@@ -49,7 +51,7 @@ export const getProducts = async (req: Request, res: Response, next: NextFunctio
       },
     ];
 
-    const paginated = await paginateAggregate(Product, pipeline, req.query);
+    const paginated = await paginateAggregate(Product, pipeline, queryParams);
     res
       .status(STATUS_CODES.OK)
       .json({ message: MESSAGE.PRODUCT.ALLPRODUCTS, data: paginated.data, total: paginated.total });
