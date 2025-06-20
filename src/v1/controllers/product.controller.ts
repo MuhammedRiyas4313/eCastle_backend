@@ -42,6 +42,12 @@ export const getProducts = async (req: Request, res: Response, next: NextFunctio
       queryParams.pageSize = "10";
     }
 
+    if (req.query.category && typeof req.query.category === "string") {
+      matchObj.category = req.query.category;
+      queryParams.pageIndex = "0";
+      queryParams.pageSize = "10";
+    }
+
     pipeline = [
       {
         $match: matchObj,
