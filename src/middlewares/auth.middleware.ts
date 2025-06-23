@@ -8,24 +8,24 @@ import { User } from "models/user.model";
  */
 
 export const authorizeJwt = async (req: Request, res: Response, next: NextFunction) => {
-  // console.log(req.headers);
-
-  const authorization = req.headers["authorization"];
-  let token = authorization && authorization.split("Bearer ")[1];
-  if (!token && typeof req.query.token == "string") {
-    token = req.query.token;
-  }
-
-  if (!token) {
-    return res.status(401).json({ message: "Invalid Token" });
-  }
-
   try {
+    const token = req.header("Authorization")?.replace("Bearer ", "");
+    console.log("Token:", token);
+    if (!token) {
+      throw new Error();
+    }
+
     const decoded: any = jwt.verify(token, CONFIG.JWT_ACCESS_TOKEN_SECRET);
+    const user = await User.findOne({ _id: decoded.userId });
+
+    if (!user) {
+      throw new Error();
+    }
+
+    req.user = decoded;
     next();
-  } catch (e) {
-    console.error(e);
-    res.status(401).json({ message: "Please Login And Try Again" });
+  } catch (error) {
+    res.status(401).json({ message: "Please authenticate" });
   }
 };
 
